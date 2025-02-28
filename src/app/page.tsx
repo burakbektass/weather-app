@@ -5,10 +5,12 @@ import ForecastRow from './components/ForecastRow'
 import SearchBar from './components/SearchBar'
 import Toast from './components/Toast'
 import { useWeather, WeatherData } from '@/hooks/useWeather'
+import TemperatureToggle from './components/TemperatureToggle'
 
 export default function Home() {
   const [city, setCity] = useState('Istanbul')
   const [showError, setShowError] = useState(true)
+  const [unit, setUnit] = useState<'C' | 'F'>('C')
   const { data, isError, error } = useWeather(city)
   const [previousData, setPreviousData] = useState<WeatherData | null>(null)
 
@@ -20,9 +22,14 @@ export default function Home() {
 
   const displayData = data || (isError ? previousData : null)
 
+  const convertTemp = (celsius: number) => {
+    return unit === 'C' ? celsius : Math.round(celsius * 9/5 + 32)
+  }
+
   return (
     <main className="h-screen w-full bg-[url('/rainy.jpg')] bg-cover bg-center">
       <SearchBar onSearch={setCity} />
+      <TemperatureToggle unit={unit} onToggle={setUnit} />
       <Toast 
         message={error?.message || ''} 
         isVisible={isError && showError} 
@@ -33,10 +40,12 @@ export default function Home() {
           <div className="flex h-full">
             <div className="self-end mb-8 ml-8">
               <div className="text-white p-6 rounded-xl bg-black/10 backdrop-blur-md inline-block">
-                <h1 className="text-8xl font-light mb-3">{displayData.current.temperature ?? '--'}°C</h1>
+                <h1 className="text-8xl font-light mb-3">
+                  {convertTemp(displayData.current.temperature)}°{unit}
+                </h1>
                 <h2 className="text-4xl font-medium mb-2">{displayData.current.location ?? '--'}</h2>
                 <p className="text-lg opacity-80">
-                  {displayData.current.time ?? '--'} | H:{displayData.current.high ?? '--'}° L:{displayData.current.low ?? '--'}°
+                  {displayData.current.time} | H:{convertTemp(displayData.current.high)}° L:{convertTemp(displayData.current.low)}°
                 </p>
               </div>
             </div>
@@ -48,7 +57,7 @@ export default function Home() {
                     <WeatherCard
                       key={index}
                       time={hour.time}
-                      temperature={hour.temperature.toString()}
+                      temperature={convertTemp(hour.temperature).toString()}
                       icon={hour.icon}
                     />
                   ))}
@@ -65,8 +74,8 @@ export default function Home() {
                       key={index}
                       day={day.day}
                       icon={day.icon}
-                      minTemp={day.minTemp.toString()}
-                      maxTemp={day.maxTemp.toString()}
+                      minTemp={convertTemp(day.minTemp).toString()}
+                      maxTemp={convertTemp(day.maxTemp).toString()}
                     />
                   ))}
                 </div>
