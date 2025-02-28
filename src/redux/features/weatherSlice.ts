@@ -63,7 +63,7 @@ const initialState: WeatherState = {
   },
   hourly: [],
   daily: [],
-  recentSearches: [],
+  recentSearches: JSON.parse(localStorage.getItem('recentSearches') || '[]'),
   loading: false,
   error: null
 }
@@ -78,6 +78,11 @@ export const weatherSlice = createSlice({
         action.payload,
         ...state.recentSearches.filter(item => item !== action.payload)
       ].slice(0, 5)
+      localStorage.setItem('recentSearches', JSON.stringify(state.recentSearches))
+    },
+    removeFromHistory: (state, action) => {
+      state.recentSearches = state.recentSearches.filter(item => item !== action.payload)
+      localStorage.setItem('recentSearches', JSON.stringify(state.recentSearches))
     },
     clearError: (state) => {
       state.error = null
@@ -138,6 +143,7 @@ export const weatherSlice = createSlice({
 // Actions
 export const { 
   addRecentSearch,
+  removeFromHistory,
   clearError
 } = weatherSlice.actions
 

@@ -1,8 +1,8 @@
 'use client'
 import { FC, useState, useRef, useEffect } from 'react'
-import { FiSearch } from 'react-icons/fi'
+import { FiSearch, FiX } from 'react-icons/fi'
 import { useAppSelector, useAppDispatch } from '@/redux/hooks'
-import { addRecentSearch, fetchWeatherData } from '@/redux/features/weatherSlice'
+import { addRecentSearch, fetchWeatherData, removeFromHistory } from '@/redux/features/weatherSlice'
 
 interface SearchBarProps {
   onSearch: (query: string) => void
@@ -42,6 +42,11 @@ const SearchBar: FC<SearchBarProps> = ({ onSearch }) => {
         inputRef.current?.blur()
       }
     }
+  }
+
+  const handleRemoveFromHistory = (e: React.MouseEvent, search: string) => {
+    e.stopPropagation()
+    dispatch(removeFromHistory(search))
   }
 
   return (
@@ -85,10 +90,16 @@ const SearchBar: FC<SearchBarProps> = ({ onSearch }) => {
                   handleSubmit(search)
                 }}
                 className="w-full px-5 py-3 text-left text-white hover:bg-white/10 
-                           transition-colors flex items-center gap-3"
+                           transition-colors flex items-center gap-3 group"
               >
                 <FiSearch size={16} className="text-white/70" />
-                {search}
+                <span className="flex-1">{search}</span>
+                <FiX
+                  size={16}
+                  className="text-white/50 hover:text-white/90 opacity-0 group-hover:opacity-100 
+                             transition-opacity"
+                  onClick={(e) => handleRemoveFromHistory(e, search)}
+                />
               </button>
             ))}
           </div>
