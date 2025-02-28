@@ -5,43 +5,35 @@ const BASE_URL = 'http://api.weatherapi.com/v1'
 
 export interface WeatherResponse {
   location: {
-    name: string
-    region: string
-    country: string
-    localtime: string
-  }
+    name: string;
+    localtime: string;
+  };
   current: {
-    temp_c: number
+    temp_c: number;
     condition: {
-      text: string
-      icon: string
-    }
-    wind_kph: number
-    humidity: number
-    feelslike_c: number
-    precip_mm: number
-  }
-  forecast?: {
-    forecastday: {
-      date: string
+      text: string;
+      icon: string;
+    };
+  };
+  forecast: {
+    forecastday: Array<{
+      date: string;
       day: {
-        maxtemp_c: number
-        mintemp_c: number
+        maxtemp_c: number;
+        mintemp_c: number;
         condition: {
-          text: string
-          icon: string
-        }
-      }
-      hour: {
-        time: string
-        temp_c: number
+          icon: string;
+        };
+      };
+      hour: Array<{
+        time: string;
+        temp_c: number;
         condition: {
-          text: string
-          icon: string
-        }
-      }[]
-    }[]
-  }
+          icon: string;
+        };
+      }>;
+    }>;
+  };
 }
 
 export const weatherApi = {
