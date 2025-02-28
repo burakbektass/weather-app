@@ -1,12 +1,19 @@
 'use client'
+import { useEffect } from 'react'
 import WeatherCard from './components/WeatherCard'
 import ForecastRow from './components/ForecastRow'
 import SearchBar from './components/SearchBar'
-import { useAppSelector } from '@/redux/hooks'
-import { selectWeather } from '@/redux/features/weatherSlice'
+import { useAppSelector, useAppDispatch } from '@/redux/hooks'
+import { selectWeather, fetchWeatherData } from '@/redux/features/weatherSlice'
 
 export default function Home() {
   const { current, hourly, daily } = useAppSelector(selectWeather)
+  const dispatch = useAppDispatch()
+
+  useEffect(() => {
+    // İlk yüklemede İstanbul için hava durumu verilerini getir
+    dispatch(fetchWeatherData('Istanbul'))
+  }, [dispatch])
 
   const handleSearch = (query: string) => {
     // İleride API entegrasyonu için burası kullanılacak

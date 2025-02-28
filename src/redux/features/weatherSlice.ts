@@ -1,5 +1,23 @@
-import { createSlice, PayloadAction } from '@reduxjs/toolkit'
+import { createSlice, createAsyncThunk } from '@reduxjs/toolkit'
+import { weatherApi, WeatherResponse } from '@/services/weatherApi'
 import type { RootState } from '../store'
+
+// Async thunks
+export const fetchWeatherData = createAsyncThunk(
+  'weather/fetchWeatherData',
+  async (city: string) => {
+    const response = await weatherApi.getForecast(city)
+    return response
+  }
+)
+
+export const searchLocations = createAsyncThunk(
+  'weather/searchLocations',
+  async (query: string) => {
+    const response = await weatherApi.searchLocations(query)
+    return response
+  }
+)
 
 // Types
 interface WeatherState {
@@ -9,6 +27,10 @@ interface WeatherState {
     time: string
     high: number
     low: number
+    condition: {
+      text: string
+      icon: string
+    }
   }
   hourly: {
     time: string
@@ -22,33 +44,28 @@ interface WeatherState {
     maxTemp: number
   }[]
   recentSearches: string[]
+  loading: boolean
+  error: string | null
 }
 
 // Initial state
 const initialState: WeatherState = {
   current: {
-    temperature: 17,
-    location: "Manchester",
-    time: "12:27",
-    high: 27,
-    low: 12
+    temperature: 0,
+    location: "",
+    time: "",
+    high: 0,
+    low: 0,
+    condition: {
+      text: "",
+      icon: ""
+    }
   },
-  hourly: [
-    { time: "Now", temperature: 17, icon: "🌧" },
-    { time: "13:00", temperature: 18, icon: "⛈" },
-    { time: "14:00", temperature: 19, icon: "⛈" },
-    { time: "15:00", temperature: 20, icon: "⛈" },
-    { time: "16:00", temperature: 19, icon: "🌥" },
-    { time: "17:00", temperature: 18, icon: "⛅" }
-  ],
-  daily: [
-    { day: "Today", icon: "🌧", minTemp: 12, maxTemp: 27 },
-    { day: "Thu", icon: "🌧", minTemp: 14, maxTemp: 25 },
-    { day: "Fri", icon: "🌥", minTemp: 15, maxTemp: 28 },
-    { day: "Sat", icon: "⛅", minTemp: 13, maxTemp: 24 },
-    { day: "Sun", icon: "🌥", minTemp: 16, maxTemp: 29 }
-  ],
-  recentSearches: []
+  hourly: [],
+  daily: [],
+  recentSearches: [],
+  loading: false,
+  error: null
 }
 
 // Slice
@@ -56,36 +73,64 @@ export const weatherSlice = createSlice({
   name: 'weather',
   initialState,
   reducers: {
-    setWeatherData: (state, action: PayloadAction<WeatherState>) => {
-      state.current = action.payload.current
-      state.hourly = action.payload.hourly
-      state.daily = action.payload.daily
-    },
-    updateCurrentWeather: (state, action: PayloadAction<WeatherState['current']>) => {
-      state.current = action.payload
-    },
-    updateHourlyForecast: (state, action: PayloadAction<WeatherState['hourly']>) => {
-      state.hourly = action.payload
-    },
-    updateDailyForecast: (state, action: PayloadAction<WeatherState['daily']>) => {
-      state.daily = action.payload
-    },
-    addRecentSearch: (state, action: PayloadAction<string>) => {
-      const search = action.payload
+    addRecentSearch: (state, action) => {
       state.recentSearches = [
-        search,
-        ...state.recentSearches.filter(item => item !== search)
+        action.payload,
+        ...state.recentSearches.filter(item => item !== action.payload)
       ].slice(0, 5)
     }
+  },
+  extraReducers: (builder) => {
+    builder
+      .addCase(fetchWeatherData.pending, (state) => {
+        state.loading = true
+        state.error = null
+      })
+      .addCase(fetchWeatherData.fulfilled, (state, action) => {
+        state.loading = false
+        const data = action.payload
+        
+        // Current weather
+        state.current = {
+          temperature: data.current.temp_c,
+          location: data.location.name,
+          time: data.location.localtime,
+          high: data.forecast?.forecastday[0]?.day.maxtemp_c ?? 0,
+          low: data.forecast?.forecastday[0]?.day.mintemp_c ?? 0,
+          condition: data.current.condition
+        }
+
+        // Hourly forecast - bugünün saatlik tahminleri
+        state.hourly = data.forecast?.forecastday[0]?.hour
+          .filter((hour) => {
+            const hourTime = new Date(hour.time)
+            const now = new Date()
+            return hourTime > now
+          })
+          .slice(0, 6) // Gelecek 6 saat
+          .map(hour => ({
+            time: new Date(hour.time).getHours() + ':00',
+            temperature: hour.temp_c,
+            icon: hour.condition.icon
+          })) ?? []
+
+        // Daily forecast - 5 günlük tahmin
+        state.daily = data.forecast?.forecastday.map((day, index) => ({
+          day: index === 0 ? 'Today' : new Date(day.date).toLocaleDateString('en-US', { weekday: 'short' }),
+          icon: day.day.condition.icon,
+          minTemp: Math.round(day.day.mintemp_c),
+          maxTemp: Math.round(day.day.maxtemp_c)
+        })) ?? []
+      })
+      .addCase(fetchWeatherData.rejected, (state, action) => {
+        state.loading = false
+        state.error = action.error.message || 'Bir hata oluştu'
+      })
   }
 })
 
 // Actions
 export const { 
-  setWeatherData, 
-  updateCurrentWeather, 
-  updateHourlyForecast, 
-  updateDailyForecast,
   addRecentSearch 
 } = weatherSlice.actions
 

@@ -2,7 +2,7 @@
 import { FC, useState, useRef, useEffect } from 'react'
 import { FiSearch } from 'react-icons/fi'
 import { useAppSelector, useAppDispatch } from '@/redux/hooks'
-import { addRecentSearch } from '@/redux/features/weatherSlice'
+import { addRecentSearch, fetchWeatherData } from '@/redux/features/weatherSlice'
 
 interface SearchBarProps {
   onSearch: (query: string) => void
@@ -28,13 +28,17 @@ const SearchBar: FC<SearchBarProps> = ({ onSearch }) => {
     return () => document.removeEventListener('mousedown', handleClickOutside)
   }, [])
 
-  const handleSubmit = (searchQuery: string) => {
+  const handleSubmit = async (searchQuery: string) => {
     if (searchQuery.trim()) {
-      onSearch(searchQuery)
-      dispatch(addRecentSearch(searchQuery))
-      setSearchTerm('')
-      setIsOpen(false)
-      inputRef.current?.blur()
+      try {
+        await dispatch(fetchWeatherData(searchQuery)).unwrap()
+        dispatch(addRecentSearch(searchQuery))
+        setSearchTerm('')
+        setIsOpen(false)
+        inputRef.current?.blur()
+      } catch (error) {
+        console.error('Weather data fetch failed:', error)
+      }
     }
   }
 
