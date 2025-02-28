@@ -78,6 +78,9 @@ export const weatherSlice = createSlice({
         action.payload,
         ...state.recentSearches.filter(item => item !== action.payload)
       ].slice(0, 5)
+    },
+    clearError: (state) => {
+      state.error = null
     }
   },
   extraReducers: (builder) => {
@@ -100,7 +103,7 @@ export const weatherSlice = createSlice({
           condition: data.current.condition
         }
 
-        // Hourly forecast - bugünün saatlik tahminleri
+        // Hourly forecast
         state.hourly = data.forecast?.forecastday[0]?.hour
           .filter((hour) => {
             const hourTime = new Date(hour.time)
@@ -114,7 +117,7 @@ export const weatherSlice = createSlice({
             icon: hour.condition.icon
           })) ?? []
 
-        // Daily forecast - 5 günlük tahmin
+        // Daily forecast 
         state.daily = data.forecast?.forecastday.map((day, index) => ({
           day: index === 0 ? 'Today' : new Date(day.date).toLocaleDateString('en-US', { weekday: 'short' }),
           icon: day.day.condition.icon,
@@ -124,14 +127,18 @@ export const weatherSlice = createSlice({
       })
       .addCase(fetchWeatherData.rejected, (state, action) => {
         state.loading = false
-        state.error = action.error.message || 'Bir hata oluştu'
+        const errorMessage = action.error.message?.includes('404') || action.error.message?.includes('400')
+          ? 'The city you searched for could not be found. Please try another location.'
+          : 'An error occurred while fetching weather data. Please try again.'
+        state.error = errorMessage
       })
   }
 })
 
 // Actions
 export const { 
-  addRecentSearch 
+  addRecentSearch,
+  clearError
 } = weatherSlice.actions
 
 // Selectors

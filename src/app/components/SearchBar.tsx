@@ -37,7 +37,9 @@ const SearchBar: FC<SearchBarProps> = ({ onSearch }) => {
         setIsOpen(false)
         inputRef.current?.blur()
       } catch (error) {
-        console.error('Weather data fetch failed:', error)
+        setSearchTerm('')
+        setIsOpen(false)
+        inputRef.current?.blur()
       }
     }
   }
