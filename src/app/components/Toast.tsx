@@ -10,9 +10,7 @@ interface ToastProps {
 const Toast: FC<ToastProps> = ({ message, isVisible, onClose }) => {
   useEffect(() => {
     if (isVisible) {
-      const timer = setTimeout(() => {
-        onClose()
-      }, 3000)
+      const timer = setTimeout(onClose, 3000)
       return () => clearTimeout(timer)
     }
   }, [isVisible, onClose])
@@ -27,12 +25,6 @@ const Toast: FC<ToastProps> = ({ message, isVisible, onClose }) => {
       <div className="bg-red-500/90 backdrop-blur-md text-white px-6 py-3 rounded-xl 
                     shadow-lg flex items-center gap-3 min-w-[300px]">
         <span className="text-sm">{message}</span>
-        <button 
-          onClick={onClose}
-          className="text-white/80 hover:text-white transition-colors ml-auto"
-        >
-          ✕
-        </button>
       </div>
     </div>
   )

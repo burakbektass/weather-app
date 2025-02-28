@@ -2,7 +2,7 @@
 import { FC, useState, useRef, useEffect } from 'react'
 import { FiSearch, FiX } from 'react-icons/fi'
 import { useAppSelector, useAppDispatch } from '@/redux/hooks'
-import { addRecentSearch, fetchWeatherData, removeFromHistory } from '@/redux/features/weatherSlice'
+import { removeFromHistory, initializeFromStorage } from '@/redux/features/weatherSlice'
 
 interface SearchBarProps {
   onSearch: (query: string) => void
@@ -17,6 +17,10 @@ const SearchBar: FC<SearchBarProps> = ({ onSearch }) => {
   const recentSearches = useAppSelector(state => state.weather.recentSearches)
 
   useEffect(() => {
+    dispatch(initializeFromStorage())
+  }, [dispatch])
+
+  useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
       if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node) &&
           inputRef.current && !inputRef.current.contains(event.target as Node)) {
@@ -28,19 +32,12 @@ const SearchBar: FC<SearchBarProps> = ({ onSearch }) => {
     return () => document.removeEventListener('mousedown', handleClickOutside)
   }, [])
 
-  const handleSubmit = async (searchQuery: string) => {
+  const handleSubmit = (searchQuery: string) => {
     if (searchQuery.trim()) {
-      try {
-        await dispatch(fetchWeatherData(searchQuery)).unwrap()
-        dispatch(addRecentSearch(searchQuery))
-        setSearchTerm('')
-        setIsOpen(false)
-        inputRef.current?.blur()
-      } catch (error) {
-        setSearchTerm('')
-        setIsOpen(false)
-        inputRef.current?.blur()
-      }
+      onSearch(searchQuery)
+      setSearchTerm('')
+      setIsOpen(false)
+      inputRef.current?.blur()
     }
   }
 
