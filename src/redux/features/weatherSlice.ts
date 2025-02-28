@@ -21,6 +21,7 @@ interface WeatherState {
     minTemp: number
     maxTemp: number
   }[]
+  recentSearches: string[]
 }
 
 // Initial state
@@ -46,7 +47,8 @@ const initialState: WeatherState = {
     { day: "Fri", icon: "🌥", minTemp: 15, maxTemp: 28 },
     { day: "Sat", icon: "⛅", minTemp: 13, maxTemp: 24 },
     { day: "Sun", icon: "🌥", minTemp: 16, maxTemp: 29 }
-  ]
+  ],
+  recentSearches: []
 }
 
 // Slice
@@ -67,6 +69,13 @@ export const weatherSlice = createSlice({
     },
     updateDailyForecast: (state, action: PayloadAction<WeatherState['daily']>) => {
       state.daily = action.payload
+    },
+    addRecentSearch: (state, action: PayloadAction<string>) => {
+      const search = action.payload
+      state.recentSearches = [
+        search,
+        ...state.recentSearches.filter(item => item !== search)
+      ].slice(0, 5)
     }
   }
 })
@@ -76,7 +85,8 @@ export const {
   setWeatherData, 
   updateCurrentWeather, 
   updateHourlyForecast, 
-  updateDailyForecast 
+  updateDailyForecast,
+  addRecentSearch 
 } = weatherSlice.actions
 
 // Selectors

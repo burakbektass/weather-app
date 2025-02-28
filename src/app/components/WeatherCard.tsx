@@ -10,9 +10,9 @@ interface WeatherCardProps {
 const WeatherCard: FC<WeatherCardProps> = ({ time, temperature, icon }) => {
   return (
     <div className="flex flex-col items-center gap-1">
-      <span className="text-xs text-gray-200">{time}</span>
-      <span className="text-xl">{icon}</span>
-      <span className="text-sm font-medium">{temperature}°C</span>
+      <span className="text-sm text-gray-200">{time}</span>
+      <span className="text-2xl">{icon}</span>
+      <span className="text-base font-medium">{temperature}°C</span>
     </div>
   )
 }

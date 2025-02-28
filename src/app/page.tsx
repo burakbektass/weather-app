@@ -1,14 +1,21 @@
 'use client'
 import WeatherCard from './components/WeatherCard'
 import ForecastRow from './components/ForecastRow'
+import SearchBar from './components/SearchBar'
 import { useAppSelector } from '@/redux/hooks'
 import { selectWeather } from '@/redux/features/weatherSlice'
 
 export default function Home() {
   const { current, hourly, daily } = useAppSelector(selectWeather)
 
+  const handleSearch = (query: string) => {
+    // İleride API entegrasyonu için burası kullanılacak
+    console.log('Searching for:', query)
+  }
+
   return (
     <main className="h-screen w-full bg-[url('/rainy.jpg')] bg-cover bg-center">
+      <SearchBar onSearch={handleSearch} />
       <div className="h-screen w-full p-8 flex flex-col gap-4">
         {/* Main Content Layout */}
         <div className="flex h-full">
@@ -41,7 +48,9 @@ export default function Home() {
 
             {/* 5-Day Forecast */}
             <div className="bg-black/10 backdrop-blur-md rounded-xl p-6">
-              <h3 className="text-white text-base mb-4">5-Day Forecast</h3>
+              <div className="border-b border-white/20 pb-2 mb-4">
+                <h3 className="text-white text-base mb-2">5-Day Forecast</h3>
+              </div>
               <div className="text-white px-4 space-y-3">
                 {daily.map((day, index) => (
                   <ForecastRow
