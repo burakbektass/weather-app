@@ -47,7 +47,8 @@ const SearchBar: FC<SearchBarProps> = ({ onSearch }) => {
   }
 
   return (
-    <div className="absolute top-8 md:top-8 left-1/2 -translate-x-1/2 w-[90%] md:w-[400px]">
+    <div className="absolute top-8 left-4 lg:left-1/2 lg:-translate-x-1/2 
+                    w-[calc(100%-140px)] lg:w-[400px]">
       <div className="relative">
         <input
           ref={inputRef}

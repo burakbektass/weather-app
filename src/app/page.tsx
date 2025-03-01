@@ -82,9 +82,9 @@ export default function Home() {
         ? getWeatherBackground(displayData.current.condition.text)
         : 'bg-[url("/rainy.jpg")]'
     } bg-cover bg-center`}>
-      <div className="relative h-24">
-        <SearchBar onSearch={setCity} />
+      <div className="relative h-28 md:h-24">
         <TemperatureToggle unit={unit} onToggle={setUnit} />
+        <SearchBar onSearch={setCity} />
         <Toast 
           message={error?.message || ''} 
           isVisible={isError && showError} 
