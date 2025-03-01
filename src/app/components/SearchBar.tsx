@@ -56,9 +56,9 @@ const SearchBar: FC<SearchBarProps> = ({ onSearch }) => {
           onChange={(e) => setSearchTerm(e.target.value)}
           onFocus={() => setIsOpen(true)}
           placeholder="Search for a city..."
-          className="w-full px-5 py-3 bg-black/10 backdrop-blur-md rounded-xl 
-                     text-white placeholder-gray-300 outline-none border border-white/10
-                     focus:border-white/30 transition-colors"
+          className="w-full px-5 py-3 bg-black/40 backdrop-blur-2xl rounded-xl 
+                   text-white placeholder-white/60 outline-none border border-white/25
+                   focus:border-white/50 transition-colors shadow-xl"
           onKeyDown={(e) => {
             if (e.key === 'Enter') {
               handleSubmit(searchTerm)
@@ -67,8 +67,8 @@ const SearchBar: FC<SearchBarProps> = ({ onSearch }) => {
         />
         <button 
           onClick={() => handleSubmit(searchTerm)}
-          className="absolute right-4 top-1/2 -translate-y-1/2 text-white/70 
-                     hover:text-white transition-colors"
+          className="absolute right-4 top-1/2 -translate-y-1/2 text-white/80 
+                   hover:text-white transition-colors"
         >
           <FiSearch size={20} />
         </button>
@@ -77,8 +77,8 @@ const SearchBar: FC<SearchBarProps> = ({ onSearch }) => {
         {isOpen && recentSearches.length > 0 && (
           <div 
             ref={dropdownRef}
-            className="absolute top-full left-0 right-0 mt-2 bg-black/10 backdrop-blur-md 
-                       rounded-xl border border-white/10 overflow-hidden"
+            className="absolute top-full left-0 right-0 mt-2 bg-black/40 backdrop-blur-2xl 
+                     rounded-xl border border-white/25 overflow-hidden shadow-xl"
           >
             {recentSearches.map((search, index) => (
               <button

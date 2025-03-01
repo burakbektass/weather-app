@@ -22,8 +22,8 @@ const Toast: FC<ToastProps> = ({ message, isVisible, onClose }) => {
       fixed top-6 right-6 z-50
       animate-[slideIn_0.5s_ease-out,fadeOut_0.5s_ease-in_2.5s]
     `}>
-      <div className="bg-red-500/90 backdrop-blur-md text-white px-6 py-3 rounded-xl 
-                    shadow-lg flex items-center gap-3 min-w-[300px] max-w-[480px]">
+      <div className="bg-red-500 text-white px-6 py-3 rounded-xl 
+                    shadow-xl flex items-center gap-3 min-w-[300px] max-w-[480px]">
         <span className="text-sm break-words text-center">{message}</span>
         <button 
           onClick={onClose}

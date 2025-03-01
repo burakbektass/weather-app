@@ -38,10 +38,9 @@ export function useWeather(city: string) {
     queryFn: async () => {
       try {
         const data = await weatherApi.getForecast(city)
-        if (city.trim()) {
-          dispatch(addRecentSearch(city))
-          setPreviousData(data)
-        }
+        const searchTerm = city.charAt(0).toUpperCase() + city.slice(1).toLowerCase()
+        dispatch(addRecentSearch(searchTerm))
+        setPreviousData(data)
         return data
       } catch (error: any) {
         throw new Error(

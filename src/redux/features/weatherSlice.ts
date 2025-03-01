@@ -1,37 +1,40 @@
-import { createSlice } from '@reduxjs/toolkit'
+import { createSlice, PayloadAction } from '@reduxjs/toolkit'
 import type { RootState } from '../store'
 
 interface WeatherState {
   recentSearches: string[]
 }
 
+const MAX_RECENT_SEARCHES = 5
+
 const initialState: WeatherState = {
-  recentSearches: [],
+  recentSearches: []
 }
 
 export const weatherSlice = createSlice({
   name: 'weather',
   initialState,
   reducers: {
-    addRecentSearch: (state, action) => {
-      if (typeof window !== 'undefined') {
-        const savedSearches = JSON.parse(localStorage.getItem('recentSearches') || '[]')
-        state.recentSearches = [
-          action.payload,
-          ...savedSearches.filter((item: string) => item !== action.payload)
-        ].slice(0, 5)
-        localStorage.setItem('recentSearches', JSON.stringify(state.recentSearches))
+    addRecentSearch: (state, action: PayloadAction<string>) => {
+      const search = action.payload
+      // Önce mevcut aramayı listeden kaldır (varsa)
+      state.recentSearches = state.recentSearches.filter(item => item !== search)
+      // Başa ekle ve son 5 kaydı tut
+      state.recentSearches.unshift(search)
+      if (state.recentSearches.length > MAX_RECENT_SEARCHES) {
+        state.recentSearches = state.recentSearches.slice(0, MAX_RECENT_SEARCHES)
       }
+      // LocalStorage'ı güncelle
+      localStorage.setItem('recentSearches', JSON.stringify(state.recentSearches))
     },
-    removeFromHistory: (state, action) => {
-      state.recentSearches = state.recentSearches.filter(item => item !== action.payload)
-      if (typeof window !== 'undefined') {
-        localStorage.setItem('recentSearches', JSON.stringify(state.recentSearches))
-      }
+    removeFromHistory: (state, action: PayloadAction<string>) => {
+      state.recentSearches = state.recentSearches.filter(search => search !== action.payload)
+      localStorage.setItem('recentSearches', JSON.stringify(state.recentSearches))
     },
     initializeFromStorage: (state) => {
-      if (typeof window !== 'undefined') {
-        state.recentSearches = JSON.parse(localStorage.getItem('recentSearches') || '[]')
+      const stored = localStorage.getItem('recentSearches')
+      if (stored) {
+        state.recentSearches = JSON.parse(stored).slice(0, MAX_RECENT_SEARCHES)
       }
     }
   }

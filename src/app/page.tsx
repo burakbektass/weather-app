@@ -15,6 +15,12 @@ export default function Home() {
   const [previousData, setPreviousData] = useState<WeatherData | null>(null)
 
   useEffect(() => {
+    if (isError) {
+      setShowError(true)
+    }
+  }, [isError, city])
+
+  useEffect(() => {
     if (data && !isError) {
       setPreviousData(data)
     }
@@ -26,8 +32,26 @@ export default function Home() {
     return unit === 'C' ? celsius : Math.round(celsius * 9/5 + 32)
   }
 
+  const getWeatherBackground = (condition: string) => {
+    const lowerCondition = condition.toLowerCase()
+    if (lowerCondition.includes('rain') || lowerCondition.includes('drizzle')) {
+      return 'bg-[url("/rainy.jpg")]'
+    }
+    if (lowerCondition.includes('snow')) {
+      return 'bg-[url("/snowy.jpg")]'
+    }
+    if (lowerCondition.includes('cloud') || lowerCondition.includes('overcast')) {
+      return 'bg-[url("/cloudy.jpg")]'
+    }
+    return 'bg-[url("/sunny.jpg")]'
+  }
+
   return (
-    <main className="h-screen w-full bg-[url('/rainy.jpg')] bg-cover bg-center">
+    <main className={`h-screen w-full ${
+      displayData 
+        ? getWeatherBackground(displayData.current.condition.text)
+        : 'bg-[url("/rainy.jpg")]'
+    } bg-cover bg-center`}>
       <SearchBar onSearch={setCity} />
       <TemperatureToggle unit={unit} onToggle={setUnit} />
       <Toast 
@@ -39,7 +63,7 @@ export default function Home() {
         <div className="h-screen w-full p-8 flex flex-col gap-4">
           <div className="flex h-full">
             <div className="self-end mb-8 ml-8">
-              <div className="text-white p-6 rounded-xl bg-black/10 backdrop-blur-md inline-block">
+              <div className="text-white p-6 rounded-xl bg-black/40 backdrop-blur-2xl shadow-xl inline-block">
                 <h1 className="text-8xl font-light mb-3">
                   {convertTemp(displayData.current.temperature)}°{unit}
                 </h1>
@@ -51,7 +75,7 @@ export default function Home() {
             </div>
 
             <div className="ml-auto flex flex-col gap-6 w-[450px] justify-center mr-8">
-              <div className="bg-black/10 backdrop-blur-md rounded-xl p-6">
+              <div className="bg-black/40 backdrop-blur-2xl rounded-xl p-6 shadow-xl">
                 <div className="flex justify-between text-white gap-[30px] px-4">
                   {displayData.hourly.map((hour:any, index: number) => (
                     <WeatherCard
@@ -64,7 +88,7 @@ export default function Home() {
                 </div>
               </div>
 
-              <div className="bg-black/10 backdrop-blur-md rounded-xl p-6">
+              <div className="bg-black/40 backdrop-blur-2xl rounded-xl p-6 shadow-xl">
                 <div className="border-b border-white/20 pb-2 mb-4">
                   <h3 className="text-white text-base mb-2">5-Day Forecast</h3>
                 </div>

@@ -9,7 +9,7 @@ interface TemperatureToggleProps {
 const TemperatureToggle: FC<TemperatureToggleProps> = ({ unit, onToggle }) => {
   return (
     <div className="fixed top-6 right-24 z-40">
-      <div className="bg-black/10 backdrop-blur-md rounded-xl p-1 flex">
+      <div className="bg-black/40 backdrop-blur-2xl rounded-xl p-1 flex shadow-xl">
         <button
           onClick={() => onToggle('C')}
           className={`px-4 py-2 rounded-lg transition-colors ${
