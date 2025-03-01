@@ -6,13 +6,33 @@ import SearchBar from './components/SearchBar'
 import Toast from './components/Toast'
 import { useWeather, WeatherData } from '@/hooks/useWeather'
 import TemperatureToggle from './components/TemperatureToggle'
+import LoadingScreen from './components/LoadingScreen'
 
 export default function Home() {
-  const [city, setCity] = useState('Istanbul')
+  const [city, setCity] = useState(() => {
+    if (typeof window !== 'undefined') {
+      return localStorage.getItem('lastSearch') || 'Istanbul'
+    }
+    return 'Istanbul'
+  })
   const [showError, setShowError] = useState(true)
-  const [unit, setUnit] = useState<'C' | 'F'>('C')
-  const { data, isError, error } = useWeather(city)
+  const [unit, setUnit] = useState<'C' | 'F'>(() => {
+    if (typeof window !== 'undefined') {
+      return (localStorage.getItem('tempUnit') as 'C' | 'F') || 'C'
+    }
+    return 'C'
+  })
+  const { data, isError, error, isLoading } = useWeather(city)
   const [previousData, setPreviousData] = useState<WeatherData | null>(null)
+  const [isInitialLoad, setIsInitialLoad] = useState(true)
+
+  useEffect(() => {
+    localStorage.setItem('lastSearch', city)
+  }, [city])
+
+  useEffect(() => {
+    localStorage.setItem('tempUnit', unit)
+  }, [unit])
 
   useEffect(() => {
     if (isError) {
@@ -23,6 +43,12 @@ export default function Home() {
   useEffect(() => {
     if (data && !isError) {
       setPreviousData(data)
+    }
+  }, [data, isError])
+
+  useEffect(() => {
+    if (data || isError) {
+      setIsInitialLoad(false)
     }
   }, [data, isError])
 
@@ -44,6 +70,10 @@ export default function Home() {
       return 'bg-[url("/cloudy.jpg")]'
     }
     return 'bg-[url("/sunny.jpg")]'
+  }
+
+  if (isInitialLoad || isLoading) {
+    return <LoadingScreen />
   }
 
   return (
