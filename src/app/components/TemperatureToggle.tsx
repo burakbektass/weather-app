@@ -8,7 +8,7 @@ interface TemperatureToggleProps {
 
 const TemperatureToggle: FC<TemperatureToggleProps> = ({ unit, onToggle }) => {
   return (
-    <div className="fixed top-6 right-24 z-40">
+    <div className="absolute top-8 md:top-6 right-4 md:right-24 z-40">
       <div className="bg-black/40 backdrop-blur-2xl rounded-xl p-1 flex shadow-xl">
         <button
           onClick={() => onToggle('C')}

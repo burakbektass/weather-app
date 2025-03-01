@@ -77,36 +77,45 @@ export default function Home() {
   }
 
   return (
-    <main className={`h-screen w-full ${
+    <main className={`min-h-screen w-full ${
       displayData 
         ? getWeatherBackground(displayData.current.condition.text)
         : 'bg-[url("/rainy.jpg")]'
     } bg-cover bg-center`}>
-      <SearchBar onSearch={setCity} />
-      <TemperatureToggle unit={unit} onToggle={setUnit} />
-      <Toast 
-        message={error?.message || ''} 
-        isVisible={isError && showError} 
-        onClose={() => setShowError(false)}
-      />
+      <div className="relative h-24">
+        <SearchBar onSearch={setCity} />
+        <TemperatureToggle unit={unit} onToggle={setUnit} />
+        <Toast 
+          message={error?.message || ''} 
+          isVisible={isError && showError} 
+          onClose={() => setShowError(false)}
+        />
+      </div>
+
       {displayData && (
-        <div className="h-screen w-full p-8 flex flex-col gap-4">
-          <div className="flex h-full">
-            <div className="self-end mb-8 ml-8">
-              <div className="text-white p-6 rounded-xl bg-black/40 backdrop-blur-2xl shadow-xl inline-block">
-                <h1 className="text-8xl font-light mb-3">
+        <div className="min-h-[calc(100vh-6rem)] w-full p-4 lg:p-8 flex flex-col">
+          <div className="flex flex-col lg:flex-row h-full items-center lg:items-end gap-8 lg:gap-0">
+            {/* Sol taraf - Ana hava durumu */}
+            <div className="w-full lg:w-auto lg:mb-8 lg:ml-8">
+              <div className="text-white p-6 rounded-xl bg-black/40 backdrop-blur-2xl shadow-xl 
+                            w-full lg:w-auto">
+                <h1 className="text-6xl lg:text-8xl font-light mb-3 text-center lg:text-left">
                   {convertTemp(displayData.current.temperature)}°{unit}
                 </h1>
-                <h2 className="text-4xl font-medium mb-2">{displayData.current.location ?? '--'}</h2>
-                <p className="text-lg opacity-80">
+                <h2 className="text-3xl lg:text-4xl font-medium mb-2 text-center lg:text-left">
+                  {displayData.current.location}
+                </h2>
+                <p className="text-base lg:text-lg opacity-80 text-center lg:text-left">
                   {displayData.current.time} | H:{convertTemp(displayData.current.high)}° L:{convertTemp(displayData.current.low)}°
                 </p>
               </div>
             </div>
 
-            <div className="ml-auto flex flex-col gap-6 w-[450px] justify-center mr-8">
-              <div className="bg-black/40 backdrop-blur-2xl rounded-xl p-6 shadow-xl">
-                <div className="flex justify-between text-white gap-[30px] px-4">
+            {/* Sağ taraf - Tahminler */}
+            <div className="w-full lg:w-[450px] lg:ml-auto flex flex-col gap-6 lg:mr-8">
+              {/* Saatlik tahmin */}
+              <div className="bg-black/40 backdrop-blur-2xl rounded-xl p-6 shadow-xl overflow-x-auto">
+                <div className="flex justify-between text-white gap-[30px] px-4 min-w-[600px] lg:min-w-0">
                   {displayData.hourly.map((hour:any, index: number) => (
                     <WeatherCard
                       key={index}
@@ -118,6 +127,7 @@ export default function Home() {
                 </div>
               </div>
 
+              {/* 5 günlük tahmin */}
               <div className="bg-black/40 backdrop-blur-2xl rounded-xl p-6 shadow-xl">
                 <div className="border-b border-white/20 pb-2 mb-4">
                   <h3 className="text-white text-base mb-2">5-Day Forecast</h3>

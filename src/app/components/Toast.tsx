@@ -19,7 +19,7 @@ const Toast: FC<ToastProps> = ({ message, isVisible, onClose }) => {
 
   return (
     <div className={`
-      fixed top-6 right-6 z-50
+      fixed top-8 md:top-6 right-4 md:right-6 z-50 max-w-[90%] md:max-w-none
       animate-[slideIn_0.5s_ease-out,fadeOut_0.5s_ease-in_2.5s]
     `}>
       <div className="bg-red-500 text-white px-6 py-3 rounded-xl 
