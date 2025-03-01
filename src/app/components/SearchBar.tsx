@@ -57,9 +57,9 @@ const SearchBar: FC<SearchBarProps> = ({ onSearch }) => {
           onChange={(e) => setSearchTerm(e.target.value)}
           onFocus={() => setIsOpen(true)}
           placeholder="Search for a city..."
-          className="w-full px-5 py-3 bg-black/40 backdrop-blur-2xl rounded-xl 
+          className="w-full px-5 pr-12 py-3 bg-black/40 backdrop-blur-2xl rounded-xl 
                    text-white placeholder-white/60 outline-none border border-white/25
-                   focus:border-white/50 transition-colors shadow-xl"
+                   focus:border-white/50 transition-colors shadow-xl text-sm sm:text-base"
           onKeyDown={(e) => {
             if (e.key === 'Enter') {
               handleSubmit(searchTerm)
@@ -69,9 +69,9 @@ const SearchBar: FC<SearchBarProps> = ({ onSearch }) => {
         <button 
           onClick={() => handleSubmit(searchTerm)}
           className="absolute right-4 top-1/2 -translate-y-1/2 text-white/80 
-                   hover:text-white transition-colors"
+                   hover:text-white transition-colors ml-2"
         >
-          <FiSearch size={20} />
+          <FiSearch size={18} className="min-w-[18px]" />
         </button>
 
         {/* Recent Searches Dropdown */}
@@ -79,7 +79,7 @@ const SearchBar: FC<SearchBarProps> = ({ onSearch }) => {
           <div 
             ref={dropdownRef}
             className="absolute top-full left-0 right-0 mt-2 bg-black/40 backdrop-blur-2xl 
-                     rounded-xl border border-white/25 overflow-hidden shadow-xl"
+                     rounded-xl border border-white/25 overflow-hidden shadow-xl z-50"
           >
             {recentSearches.map((search, index) => (
               <button
@@ -91,11 +91,11 @@ const SearchBar: FC<SearchBarProps> = ({ onSearch }) => {
                            transition-colors flex items-center gap-3 group"
               >
                 <FiSearch size={16} className="text-white/70" />
-                <span className="flex-1">{search}</span>
+                <span className="flex-1 truncate">{search}</span>
                 <FiX
                   size={16}
                   className="text-white/50 hover:text-white/90 opacity-0 group-hover:opacity-100 
-                             transition-opacity"
+                             transition-opacity shrink-0"
                   onClick={(e) => handleRemoveFromHistory(e, search)}
                 />
               </button>
