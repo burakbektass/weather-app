@@ -12,9 +12,13 @@ A sleek and responsive weather application built with Next.js 14, featuring real
 - 📅 **5-Day Forecast**: Plan ahead with a 5-day weather outlook
 - 📝 **Search History**: Quick access to your recently searched locations
 - 🌡️ **Temperature Units**: Toggle between Celsius and Fahrenheit
+- 🌬️ **Wind Speed Units**: Toggle between KPH and MPH
 - 📱 **Responsive Design**: Seamlessly works on desktop, tablet, and mobile devices
 - ⚡ **Loading States**: Smooth loading transitions with a custom loading screen
-- 🚨 **Error Handling**: User-friendly error messages for failed requests
+- 🚨 **Error Handling**: User-friendly error messages with fallback states
+- 🔗 **URL Routing**: Share weather states via URL
+- 💾 **State Persistence**: Remembers your preferences and last search
+- 🎯 **Smart Error Recovery**: Maintains previous data during API errors
 
 ## 🛠️ Tech Stack
 
@@ -25,6 +29,9 @@ A sleek and responsive weather application built with Next.js 14, featuring real
 - 📘 **TypeScript**: For type safety
 - 🌐 **Weather API**: WeatherAPI.com
 - 💫 **Icons**: React Icons
+- 🎭 **Component Loading**: React Suspense & Lazy Loading
+- 🦴 **Loading UI**: Skeleton Components
+- 🔒 **URL Safety**: Input Sanitization
 
 ## 🚀 Getting Started
 
@@ -59,12 +66,16 @@ npm run dev
 - 📱 **Responsive Components**: Optimized for all screen sizes
 - 🔍 **Intuitive Search**: With recent searches history
 - 🚨 **Error Feedback**: Clear error messages with toast notifications
+- 🦴 **Loading Skeletons**: Beautiful loading states for components
+- 🎯 **Fallback UI**: Graceful degradation during errors
 
 ## 💾 State Management
 
-- 🔄 **Redux Store**: Manages search history and temperature unit preference
+- 🔄 **Redux Store**: Manages search history and unit preferences
 - 💿 **Local Storage**: Persists user preferences and recent searches
 - ⚡ **React Query**: Handles API data fetching and caching
+- 🔗 **URL State**: Syncs weather state with URL parameters
+- 🛡️ **Error States**: Maintains UI during API failures
 
 ## 🌐 API Integration
 
@@ -73,6 +84,14 @@ The app uses WeatherAPI.com to fetch:
 - ⏰ Hourly forecasts
 - 📅 5-day weather predictions
 - 📍 Location data
+
+## 🔧 Performance Optimizations
+
+- ⚡ **Lazy Loading**: Components load on demand
+- 🧠 **Memoization**: Optimized re-renders with useCallback
+- 📦 **Code Splitting**: Reduced initial bundle size
+- 🎯 **Error Boundaries**: Graceful error handling
+- 💾 **Data Caching**: Efficient API request management
 
 ## 📄 License
 
