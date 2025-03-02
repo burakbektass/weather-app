@@ -3,6 +3,7 @@ import { weatherApi, WeatherResponse } from '@/services/weatherApi'
 import { useAppDispatch } from '@/redux/hooks'
 import { addRecentSearch } from '@/redux/features/weatherSlice'
 import { useState } from 'react'
+import { sanitizeCity } from '@/utils/urlUtils'
 
 export interface WeatherData {
   current: {
@@ -46,8 +47,11 @@ export function useWeather(city: string) {
         setPreviousData(data)
         return data
       } catch (error: any) {
+        if (previousData) {
+          setPreviousData(previousData)
+        }
         throw new Error(
-          error.response?.status === 400 || error.response?.status === 404
+          error.response?.status === 404
             ? 'The city you searched for could not be found. Please try another location.'
             : 'An error occurred while fetching weather data. Please try again.'
         )

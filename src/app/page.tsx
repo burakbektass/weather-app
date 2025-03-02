@@ -8,11 +8,15 @@ import { useWeather, WeatherData } from '@/hooks/useWeather'
 import TemperatureToggle from './components/TemperatureToggle'
 import LoadingScreen from './components/LoadingScreen'
 import WindSpeedToggle from './components/WindSpeedToggle'
+import { useSearchParams, useRouter } from 'next/navigation'
+import { sanitizeCity } from '@/utils/urlUtils'
 
 export default function Home() {
+  const searchParams = useSearchParams()
+  const router = useRouter()
   const [city, setCity] = useState(() => {
     if (typeof window !== 'undefined') {
-      return localStorage.getItem('lastSearch') || 'Istanbul'
+      return searchParams?.get('city') || localStorage.getItem('lastSearch') || 'Istanbul'
     }
     return 'Istanbul'
   })
@@ -87,6 +91,25 @@ export default function Home() {
     return 'bg-[url("/sunny.jpg")]'
   }
 
+  const handleSearch = (newCity: string) => {
+    setCity(newCity)
+    const params = new URLSearchParams(searchParams?.toString() || '')
+    params.set('city', newCity)
+    router.push(`/?${params.toString()}`)
+  }
+
+  useEffect(() => {
+    const urlCity = searchParams ? searchParams.get('city') : null
+    if (urlCity) {
+      const sanitizedCity = sanitizeCity(urlCity)
+      if (sanitizedCity !== urlCity) {
+        const params = new URLSearchParams(searchParams?.toString() || '')
+        params.set('city', sanitizedCity)
+        router.replace(`/?${params.toString()}`)
+      }
+    }
+  }, [searchParams, router])
+
   if (isInitialLoad || isLoading) {
     return <LoadingScreen />
   }
@@ -99,7 +122,7 @@ export default function Home() {
     } bg-cover bg-center`}>
       <div className="relative h-28 md:h-24">
         <TemperatureToggle unit={unit} onToggle={setUnit} />
-        <SearchBar onSearch={setCity} />
+        <SearchBar onSearch={handleSearch} />
         <Toast 
           message={error?.message || ''} 
           isVisible={isError && showError} 
