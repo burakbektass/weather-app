@@ -54,8 +54,12 @@ export const weatherApi = {
 
   // 5 günlük tahmin
   getForecast: async (city: string, days: number = 5): Promise<WeatherResponse> => {
+    if (!API_KEY) {
+      throw new Error('Weather API key is not configured')
+    }
+
     const response = await fetch(
-      `${BASE_URL}/forecast.json?key=${process.env.NEXT_PUBLIC_WEATHER_API_KEY}&q=${city}&days=${days}&aqi=no`,
+      `${BASE_URL}/forecast.json?key=${API_KEY}&q=${city}&days=${days}&aqi=no`,
       {
         headers: {
           'Content-Type': 'application/json'
