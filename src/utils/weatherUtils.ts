@@ -6,16 +6,16 @@ export const convertWindSpeed = (kph: number, unit: 'KPH' | 'MPH') => {
   return unit === 'KPH' ? Math.round(kph) : Math.round(kph * 0.621371)
 }
 
-export const getWeatherBackground = (condition: string) => {
+export const getWeatherBackground = (condition: string): string => {
   const lowerCondition = condition.toLowerCase()
   if (lowerCondition.includes('rain') || lowerCondition.includes('drizzle')) {
-    return 'bg-[url("/rainy.jpg")]'
+    return 'rainy'
   }
   if (lowerCondition.includes('snow')) {
-    return 'bg-[url("/snowy.jpg")]'
+    return 'snowy'
   }
   if (lowerCondition.includes('cloud') || lowerCondition.includes('overcast')) {
-    return 'bg-[url("/cloudy.jpg")]'
+    return 'cloudy'
   }
-  return 'bg-[url("/sunny.jpg")]'
+  return 'sunny'
 } 

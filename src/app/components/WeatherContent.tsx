@@ -1,8 +1,9 @@
 'use client'
-import { useState, useEffect, Suspense, lazy } from 'react'
+import { useState, useEffect, Suspense, lazy, useCallback } from 'react'
 import { useWeather, WeatherData } from '@/hooks/useWeather'
 import { useSearchParams, useRouter } from 'next/navigation'
 import { sanitizeCity } from '@/utils/urlUtils'
+import { getWeatherBackground } from '@/utils/weatherUtils'
 import LoadingScreen from './LoadingScreen'
 
 // Lazy loaded components
@@ -21,6 +22,15 @@ const CardSkeleton = () => (
 const ToggleSkeleton = () => (
   <div className="animate-pulse bg-white/10 rounded-lg h-10 w-20" />
 )
+
+// Utility functions
+const convertTemp = (celsius: number, unit: 'C' | 'F') => {
+  return unit === 'C' ? celsius : Math.round(celsius * 9/5 + 32)
+}
+
+const convertWindSpeed = (kph: number, unit: 'KPH' | 'MPH') => {
+  return unit === 'KPH' ? Math.round(kph) : Math.round(kph * 0.621371)
+}
 
 export default function WeatherContent() {
   const searchParams = useSearchParams()
@@ -80,34 +90,22 @@ export default function WeatherContent() {
 
   const displayData = data || (isError ? previousData : null)
 
-  const convertTemp = (celsius: number) => {
-    return unit === 'C' ? celsius : Math.round(celsius * 9/5 + 32)
-  }
+  // Dönüşüm fonksiyonlarını memoize edelim
+  const handleTempConvert = useCallback((celsius: number) => {
+    return convertTemp(celsius, unit)
+  }, [unit])
 
-  const convertWindSpeed = (kph: number) => {
-    return windUnit === 'KPH' ? Math.round(kph) : Math.round(kph * 0.621371)
-  }
+  const handleWindConvert = useCallback((kph: number) => {
+    return convertWindSpeed(kph, windUnit)
+  }, [windUnit])
 
-  const getWeatherBackground = (condition: string) => {
-    const lowerCondition = condition.toLowerCase()
-    if (lowerCondition.includes('rain') || lowerCondition.includes('drizzle')) {
-      return 'bg-[url("/rainy.jpg")]'
-    }
-    if (lowerCondition.includes('snow')) {
-      return 'bg-[url("/snowy.jpg")]'
-    }
-    if (lowerCondition.includes('cloud') || lowerCondition.includes('overcast')) {
-      return 'bg-[url("/cloudy.jpg")]'
-    }
-    return 'bg-[url("/sunny.jpg")]'
-  }
-
-  const handleSearch = (newCity: string) => {
+  // URL handling
+  const handleSearch = useCallback((newCity: string) => {
     setCity(newCity)
     const params = new URLSearchParams(searchParams?.toString() || '')
     params.set('city', newCity)
     router.push(`/?${params.toString()}`)
-  }
+  }, [searchParams, router])
 
   useEffect(() => {
     const urlCity = searchParams ? searchParams.get('city') : null
@@ -126,11 +124,14 @@ export default function WeatherContent() {
   }
 
   return (
-    <main className={`min-h-screen w-full ${
-      displayData 
-        ? getWeatherBackground(displayData.current.condition.text)
-        : 'bg-[url("/rainy.jpg")]'
-    } bg-cover bg-center`}>
+    <main 
+      style={{ 
+        backgroundImage: displayData 
+          ? `url('/${getWeatherBackground(displayData.current.condition.text)}.jpg')`
+          : "url('/rainy.jpg')" 
+      }}
+      className="min-h-screen w-full bg-cover bg-center"
+    >
       <div className="relative h-28 md:h-24">
         <Suspense fallback={<ToggleSkeleton />}>
           <TemperatureToggle unit={unit} onToggle={setUnit} />
@@ -155,7 +156,7 @@ export default function WeatherContent() {
               <div className="text-white p-6 rounded-xl bg-black/40 backdrop-blur-2xl shadow-xl 
                             w-full lg:w-auto">
                 <h1 className="text-6xl lg:text-8xl font-light mb-3 text-center lg:text-left">
-                  {convertTemp(displayData.current.temperature)}°{unit}
+                  {handleTempConvert(displayData.current.temperature)}°{unit}
                 </h1>
                 <div className="mb-2 text-center lg:text-left">
                   <h2 className="text-3xl lg:text-4xl font-medium">
@@ -166,9 +167,9 @@ export default function WeatherContent() {
                   </p>
                 </div>
                 <div className="flex flex-col gap-1 text-base lg:text-lg opacity-80 text-center lg:text-left">
-                  <p>{displayData.current.time} | H:{convertTemp(displayData.current.high)}° L:{convertTemp(displayData.current.low)}°</p>
+                  <p>{displayData.current.time} | H:{handleTempConvert(displayData.current.high)}° L:{handleTempConvert(displayData.current.low)}°</p>
                   <div className="flex items-center justify-center lg:justify-start">
-                    <span>Humidity: {displayData.current.humidity}% | Wind: {convertWindSpeed(displayData.current.windSpeed)}</span>
+                    <span>Humidity: {displayData.current.humidity}% | Wind: {handleWindConvert(displayData.current.windSpeed)}</span>
                     <WindSpeedToggle unit={windUnit} onToggle={setWindUnit} />
                   </div>
                 </div>
@@ -184,8 +185,9 @@ export default function WeatherContent() {
                     <Suspense key={index} fallback={<CardSkeleton />}>
                       <WeatherCard
                         time={hour.time}
-                        temperature={convertTemp(hour.temperature).toString()}
+                        temperature={handleTempConvert(hour.temperature).toString()}
                         icon={hour.icon}
+                        unit={unit}
                       />
                     </Suspense>
                   ))}
@@ -203,8 +205,9 @@ export default function WeatherContent() {
                       <ForecastRow
                         day={day.day}
                         icon={day.icon}
-                        minTemp={convertTemp(day.minTemp).toString()}
-                        maxTemp={convertTemp(day.maxTemp).toString()}
+                        minTemp={handleTempConvert(day.minTemp).toString()}
+                        maxTemp={handleTempConvert(day.maxTemp).toString()}
+                        unit={unit}
                       />
                     </Suspense>
                   ))}

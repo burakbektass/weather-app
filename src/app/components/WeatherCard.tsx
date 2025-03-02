@@ -5,14 +5,15 @@ interface WeatherCardProps {
   time: string
   temperature: string
   icon: string
+  unit: 'C' | 'F'
 }
 
-const WeatherCard: FC<WeatherCardProps> = ({ time, temperature, icon }) => {
+const WeatherCard: FC<WeatherCardProps> = ({ time, temperature, icon, unit }) => {
   return (
-    <div className="flex flex-col items-center gap-1">
-      <span className="text-sm text-gray-200">{time}</span>
-      <img src={icon} alt="weather" className="w-8 h-8" />
-      <span className="text-base font-medium">{Math.round(Number(temperature))}°C</span>
+    <div className="flex flex-col items-center">
+      <span className="text-sm">{time}</span>
+      <img src={icon} alt="weather icon" className="w-8 h-8 my-2" />
+      <span className="text-sm">{temperature}°{unit}</span>
     </div>
   )
 }
