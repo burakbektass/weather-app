@@ -59,10 +59,15 @@ const formatHourlyData = (forecast: any) => {
 }
 
 export const useWeather = (city: string) => {
+  const dispatch = useAppDispatch()
+
   return useQuery({
     queryKey: ['weather', city],
     queryFn: async () => {
       const response = await weatherApi.getForecast(city)
+      
+      dispatch(addRecentSearch(response.location.name))
+      
       return {
         current: {
           temperature: response.current.temp_c,
