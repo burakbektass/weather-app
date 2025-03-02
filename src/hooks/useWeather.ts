@@ -13,8 +13,8 @@ export interface WeatherData {
     time: string;
     high: number;
     low: number;
-    humidity: number;    // Nem
-    windSpeed: number;   // Rüzgar hızı
+    humidity: number;    
+    windSpeed: number;   
     condition: {
       text: string;
       icon: string;

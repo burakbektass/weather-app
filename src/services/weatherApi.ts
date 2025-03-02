@@ -11,8 +11,8 @@ export interface WeatherResponse {
   };
   current: {
     temp_c: number;
-    humidity: number;    // Nem
-    wind_kph: number;    // Rüzgar hızı
+    humidity: number;    
+    wind_kph: number;    
     condition: {
       text: string;
       icon: string;
@@ -40,7 +40,6 @@ export interface WeatherResponse {
 }
 
 export const weatherApi = {
-  // Mevcut hava durumu
   getCurrentWeather: async (city: string): Promise<WeatherResponse> => {
     const response = await axios.get(`${BASE_URL}/current.json`, {
       params: {
@@ -52,7 +51,6 @@ export const weatherApi = {
     return response.data
   },
 
-  // 5 günlük tahmin
   getForecast: async (city: string, days: number = 5): Promise<WeatherResponse> => {
     if (!API_KEY) {
       throw new Error('Weather API key is not configured')
@@ -78,7 +76,6 @@ export const weatherApi = {
     return response.json()
   },
 
-  // Şehir arama/otomatik tamamlama
   searchLocations: async (query: string) => {
     const response = await axios.get(`${BASE_URL}/search.json`, {
       params: {

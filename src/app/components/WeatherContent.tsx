@@ -6,7 +6,7 @@ import { sanitizeCity } from '@/utils/urlUtils'
 import { getWeatherBackground } from '@/utils/weatherUtils'
 import LoadingScreen from './LoadingScreen'
 
-// Lazy loaded components
+
 const WeatherCard = lazy(() => import('./WeatherCard'))
 const ForecastRow = lazy(() => import('./ForecastRow'))
 const SearchBar = lazy(() => import('./SearchBar'))
@@ -14,7 +14,6 @@ const Toast = lazy(() => import('./Toast'))
 const TemperatureToggle = lazy(() => import('./TemperatureToggle'))
 const WindSpeedToggle = lazy(() => import('./WindSpeedToggle'))
 
-// Fallback components
 const CardSkeleton = () => (
   <div className="animate-pulse bg-white/10 rounded-lg h-24 w-16" />
 )
@@ -23,7 +22,6 @@ const ToggleSkeleton = () => (
   <div className="animate-pulse bg-white/10 rounded-lg h-10 w-20" />
 )
 
-// Utility functions
 const convertTemp = (celsius: number, unit: 'C' | 'F') => {
   return unit === 'C' ? celsius : Math.round(celsius * 9/5 + 32)
 }
@@ -90,7 +88,6 @@ export default function WeatherContent() {
 
   const displayData = data || (isError ? previousData : null)
 
-  // Dönüşüm fonksiyonlarını memoize edelim
   const handleTempConvert = useCallback((celsius: number) => {
     return convertTemp(celsius, unit)
   }, [unit])
@@ -98,8 +95,7 @@ export default function WeatherContent() {
   const handleWindConvert = useCallback((kph: number) => {
     return convertWindSpeed(kph, windUnit)
   }, [windUnit])
-
-  // URL handling
+  
   const handleSearch = useCallback((newCity: string) => {
     setCity(newCity)
     const params = new URLSearchParams(searchParams?.toString() || '')
@@ -151,7 +147,6 @@ export default function WeatherContent() {
       {displayData && (
         <div className="min-h-[calc(100vh-6rem)] w-full p-4 lg:p-8 flex flex-col">
           <div className="flex flex-col lg:flex-row h-full items-center lg:items-end gap-8 lg:gap-0">
-            {/* Sol taraf - Ana hava durumu */}
             <div className="w-full lg:w-auto lg:mb-8 lg:ml-8">
               <div className="text-white p-6 rounded-xl bg-black/40 backdrop-blur-2xl shadow-xl w-full lg:w-auto">
                 <div className="flex items-baseline justify-center lg:justify-start gap-3 mb-3">
@@ -180,11 +175,8 @@ export default function WeatherContent() {
               </div>
             </div>
 
-            {/* Sağ taraf - Tahminler */}
             <div className="w-full lg:w-[450px] lg:ml-auto flex flex-col gap-6 lg:mr-8">
-              {/* Saatlik tahmin */}
               <div className="bg-black/40 backdrop-blur-2xl rounded-xl p-4 shadow-xl relative">
-                {/* Scroll göstergesi */}
                 <div className="absolute right-0 top-1/2 -translate-y-1/2 w-12 h-full 
                   bg-gradient-to-l from-black/20 to-transparent pointer-events-none rounded-r-xl" 
                 />
@@ -205,7 +197,6 @@ export default function WeatherContent() {
                 </div>
               </div>
 
-              {/* 5 günlük tahmin */}
               <div className="bg-black/40 backdrop-blur-2xl rounded-xl p-6 shadow-xl">
                 <div className="border-b border-white/20 pb-2 mb-4">
                   <h3 className="text-white text-base mb-2">5-Day Forecast</h3>

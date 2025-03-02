@@ -6,8 +6,8 @@ import { store } from '@/redux/store'
 const queryClient = new QueryClient({
   defaultOptions: {
     queries: {
-      staleTime: 5 * 60 * 1000, // Data is fresh for 5 minutes
-      gcTime: 10 * 60 * 1000,   // Changed from cacheTime to gcTime
+      staleTime: 5 * 60 * 1000, 
+      gcTime: 10 * 60 * 1000,  
     },
   },
 })
