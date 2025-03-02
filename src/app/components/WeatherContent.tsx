@@ -1,15 +1,26 @@
 'use client'
-import { useState, useEffect } from 'react'
-import WeatherCard from './WeatherCard'
-import ForecastRow from './ForecastRow'
-import SearchBar from './SearchBar'
-import Toast from './Toast'
+import { useState, useEffect, Suspense, lazy } from 'react'
 import { useWeather, WeatherData } from '@/hooks/useWeather'
-import TemperatureToggle from './TemperatureToggle'
-import LoadingScreen from './LoadingScreen'
-import WindSpeedToggle from './WindSpeedToggle'
 import { useSearchParams, useRouter } from 'next/navigation'
 import { sanitizeCity } from '@/utils/urlUtils'
+import LoadingScreen from './LoadingScreen'
+
+// Lazy loaded components
+const WeatherCard = lazy(() => import('./WeatherCard'))
+const ForecastRow = lazy(() => import('./ForecastRow'))
+const SearchBar = lazy(() => import('./SearchBar'))
+const Toast = lazy(() => import('./Toast'))
+const TemperatureToggle = lazy(() => import('./TemperatureToggle'))
+const WindSpeedToggle = lazy(() => import('./WindSpeedToggle'))
+
+// Fallback components
+const CardSkeleton = () => (
+  <div className="animate-pulse bg-white/10 rounded-lg h-24 w-16" />
+)
+
+const ToggleSkeleton = () => (
+  <div className="animate-pulse bg-white/10 rounded-lg h-10 w-20" />
+)
 
 export default function WeatherContent() {
   const searchParams = useSearchParams()
@@ -121,13 +132,19 @@ export default function WeatherContent() {
         : 'bg-[url("/rainy.jpg")]'
     } bg-cover bg-center`}>
       <div className="relative h-28 md:h-24">
-        <TemperatureToggle unit={unit} onToggle={setUnit} />
-        <SearchBar onSearch={handleSearch} />
-        <Toast 
-          message={error?.message || ''} 
-          isVisible={isError && showError} 
-          onClose={() => setShowError(false)}
-        />
+        <Suspense fallback={<ToggleSkeleton />}>
+          <TemperatureToggle unit={unit} onToggle={setUnit} />
+        </Suspense>
+        <Suspense fallback={<div className="animate-pulse bg-white/10 h-12 rounded-xl" />}>
+          <SearchBar onSearch={handleSearch} />
+        </Suspense>
+        <Suspense fallback={null}>
+          <Toast 
+            message={error?.message || ''} 
+            isVisible={isError && showError} 
+            onClose={() => setShowError(false)}
+          />
+        </Suspense>
       </div>
 
       {displayData && (
@@ -164,12 +181,13 @@ export default function WeatherContent() {
               <div className="bg-black/40 backdrop-blur-2xl rounded-xl p-6 shadow-xl overflow-x-auto">
                 <div className="flex justify-between text-white gap-[30px] px-4 min-w-[600px] lg:min-w-0">
                   {displayData.hourly.map((hour:any, index: number) => (
-                    <WeatherCard
-                      key={index}
-                      time={hour.time}
-                      temperature={convertTemp(hour.temperature).toString()}
-                      icon={hour.icon}
-                    />
+                    <Suspense key={index} fallback={<CardSkeleton />}>
+                      <WeatherCard
+                        time={hour.time}
+                        temperature={convertTemp(hour.temperature).toString()}
+                        icon={hour.icon}
+                      />
+                    </Suspense>
                   ))}
                 </div>
               </div>
@@ -181,13 +199,14 @@ export default function WeatherContent() {
                 </div>
                 <div className="text-white px-4 space-y-3">
                   {displayData.daily.map((day:any, index: number) => (
-                    <ForecastRow
-                      key={index}
-                      day={day.day}
-                      icon={day.icon}
-                      minTemp={convertTemp(day.minTemp).toString()}
-                      maxTemp={convertTemp(day.maxTemp).toString()}
-                    />
+                    <Suspense key={index} fallback={<div className="animate-pulse bg-white/10 h-12 rounded-lg" />}>
+                      <ForecastRow
+                        day={day.day}
+                        icon={day.icon}
+                        minTemp={convertTemp(day.minTemp).toString()}
+                        maxTemp={convertTemp(day.maxTemp).toString()}
+                      />
+                    </Suspense>
                   ))}
                 </div>
               </div>
