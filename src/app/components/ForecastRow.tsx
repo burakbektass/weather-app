@@ -9,17 +9,22 @@ interface ForecastRowProps {
   unit: 'C' | 'F'
 }
 
-const ForecastRow: FC<ForecastRowProps> = ({ day, icon, minTemp, maxTemp, unit }) => {
+export default function ForecastRow({ day, icon, minTemp, maxTemp, unit }: ForecastRowProps) {
   return (
     <div className="flex items-center justify-between">
-      <span className="w-24">{day}</span>
-      <img src={icon} alt="weather icon" className="w-8 h-8" />
-      <div className="flex gap-4">
-        <span>{maxTemp}°{unit}</span>
-        <span className="opacity-50">{minTemp}°{unit}</span>
+      <span className="w-[100px] text-sm">{day}</span>
+      <div className="flex-1 flex justify-center">
+        <img 
+          src={icon} 
+          alt="weather icon" 
+          className="w-8 h-8 min-w-[32px]"
+        />
+      </div>
+      <div className="w-[100px] text-right">
+        <span className="text-sm">
+          {maxTemp}°{unit} / {minTemp}°{unit}
+        </span>
       </div>
     </div>
   )
-}
-
-export default ForecastRow 
+} 
