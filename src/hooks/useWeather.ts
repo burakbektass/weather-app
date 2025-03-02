@@ -1,5 +1,5 @@
 import { useQuery } from '@tanstack/react-query'
-import { weatherApi, WeatherResponse } from '@/services/weatherApi'
+import { weatherApi } from '@/services/weatherApi'
 import { useAppDispatch } from '@/redux/hooks'
 import { addRecentSearch } from '@/redux/features/weatherSlice'
 import { useState } from 'react'
@@ -33,64 +33,60 @@ export interface WeatherData {
   }>;
 }
 
-export function useWeather(city: string) {
-  const dispatch = useAppDispatch()
-  const [previousData, setPreviousData] = useState<WeatherResponse | null>(null)
+const formatHourlyData = (forecast: any) => {
+  const now = new Date()
+  const currentHour = now.getHours()
+  
+  const today = forecast.forecastday[0].hour
+  const tomorrow = forecast.forecastday[1].hour
+  
+  let hourlyData = []
+  
+  const remainingHoursToday = today.slice(currentHour)
+  hourlyData.push(...remainingHoursToday)
+  
+  if (hourlyData.length < 12) {
+    const neededHours = 12 - hourlyData.length
+    const tomorrowHours = tomorrow.slice(0, neededHours)
+    hourlyData.push(...tomorrowHours)
+  }
+  
+  return hourlyData.slice(0, 12).map((hour: any) => ({
+    time: new Date(hour.time).getHours() + ':00',
+    temperature: hour.temp_c,
+    icon: hour.condition.icon
+  }))
+}
 
-  return useQuery<WeatherResponse, Error, WeatherData>({
+export const useWeather = (city: string) => {
+  return useQuery({
     queryKey: ['weather', city],
     queryFn: async () => {
-      try {
-        const data = await weatherApi.getForecast(city)
-        const searchTerm = city.charAt(0).toUpperCase() + city.slice(1).toLowerCase()
-        dispatch(addRecentSearch(searchTerm))
-        setPreviousData(data)
-        return data
-      } catch (error: any) {
-        if (previousData) {
-          setPreviousData(previousData)
-        }
-        throw new Error(
-          error.response?.status === 404
-            ? 'The city you searched for could not be found. Please try another location.'
-            : 'An error occurred while fetching weather data. Please try again.'
-        )
+      const response = await weatherApi.getForecast(city)
+      return {
+        current: {
+          temperature: response.current.temp_c,
+          high: response.forecast.forecastday[0].day.maxtemp_c,
+          low: response.forecast.forecastday[0].day.mintemp_c,
+          humidity: response.current.humidity,
+          windSpeed: response.current.wind_kph,
+          condition: response.current.condition,
+          location: response.location.name,
+          country: response.location.country,
+          time: new Date(response.location.localtime).toLocaleTimeString([], { 
+            hour: '2-digit', 
+            minute: '2-digit' 
+          })
+        },
+        hourly: formatHourlyData(response.forecast),
+        daily: response.forecast.forecastday.map((day: any) => ({
+          day: new Date(day.date).toLocaleDateString('en-US', { weekday: 'short' }),
+          minTemp: day.day.mintemp_c,
+          maxTemp: day.day.maxtemp_c,
+          icon: day.day.condition.icon
+        }))
       }
     },
-    enabled: Boolean(city),
-    retry: false,
-    gcTime: Infinity,
-    placeholderData: previousData || undefined,
-    select: (data) => ({
-      current: {
-        temperature: data.current.temp_c,
-        location: data.location.name,
-        country: data.location.country,
-        time: data.location.localtime,
-        high: data.forecast.forecastday[0].day.maxtemp_c,
-        low: data.forecast.forecastday[0].day.mintemp_c,
-        humidity: data.current.humidity,    // Nem
-        windSpeed: data.current.wind_kph,   // Rüzgar hızı
-        condition: data.current.condition
-      },
-      hourly: data.forecast.forecastday[0].hour
-        .filter((hour) => {
-          const hourTime = new Date(hour.time)
-          const now = new Date()
-          return hourTime > now
-        })
-        .slice(0, 6)
-        .map(hour => ({
-          time: new Date(hour.time).getHours() + ':00',
-          temperature: hour.temp_c,
-          icon: hour.condition.icon
-        })),
-      daily: data.forecast.forecastday.map((day, index) => ({
-        day: index === 0 ? 'Today' : new Date(day.date).toLocaleDateString('en-US', { weekday: 'short' }),
-        icon: day.day.condition.icon,
-        minTemp: Math.round(day.day.mintemp_c),
-        maxTemp: Math.round(day.day.maxtemp_c)
-      }))
-    })
+    enabled: Boolean(city)
   })
 } 

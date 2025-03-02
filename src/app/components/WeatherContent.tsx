@@ -153,16 +153,20 @@ export default function WeatherContent() {
           <div className="flex flex-col lg:flex-row h-full items-center lg:items-end gap-8 lg:gap-0">
             {/* Sol taraf - Ana hava durumu */}
             <div className="w-full lg:w-auto lg:mb-8 lg:ml-8">
-              <div className="text-white p-6 rounded-xl bg-black/40 backdrop-blur-2xl shadow-xl 
-                            w-full lg:w-auto">
-                <h1 className="text-6xl lg:text-8xl font-light mb-3 text-center lg:text-left">
-                  {handleTempConvert(displayData.current.temperature)}°{unit}
-                </h1>
+              <div className="text-white p-6 rounded-xl bg-black/40 backdrop-blur-2xl shadow-xl w-full lg:w-auto">
+                <div className="flex items-baseline justify-center lg:justify-start gap-3 mb-3">
+                  <h1 className="text-5xl lg:text-6xl font-light">
+                    {handleTempConvert(displayData.current.temperature)}°{unit}
+                  </h1>
+                  <span className="text-sm lg:text-base text-white/70">
+                    {displayData.current.condition.text}
+                  </span>
+                </div>
                 <div className="mb-2 text-center lg:text-left">
-                  <h2 className="text-3xl lg:text-4xl font-medium">
+                  <h2 className="text-2xl lg:text-3xl font-medium">
                     {displayData.current.location}
                   </h2>
-                  <p className="text-lg lg:text-xl text-white/80">
+                  <p className="text-lg text-white/80">
                     {displayData.current.country}
                   </p>
                 </div>
@@ -179,18 +183,25 @@ export default function WeatherContent() {
             {/* Sağ taraf - Tahminler */}
             <div className="w-full lg:w-[450px] lg:ml-auto flex flex-col gap-6 lg:mr-8">
               {/* Saatlik tahmin */}
-              <div className="bg-black/40 backdrop-blur-2xl rounded-xl p-6 shadow-xl overflow-x-auto">
-                <div className="flex justify-between text-white gap-[30px] px-4 min-w-[600px] lg:min-w-0">
-                  {displayData.hourly.map((hour:any, index: number) => (
-                    <Suspense key={index} fallback={<CardSkeleton />}>
-                      <WeatherCard
-                        time={hour.time}
-                        temperature={handleTempConvert(hour.temperature).toString()}
-                        icon={hour.icon}
-                        unit={unit}
-                      />
-                    </Suspense>
-                  ))}
+              <div className="bg-black/40 backdrop-blur-2xl rounded-xl p-4 shadow-xl relative">
+                {/* Scroll göstergesi */}
+                <div className="absolute right-0 top-1/2 -translate-y-1/2 w-12 h-full 
+                  bg-gradient-to-l from-black/20 to-transparent pointer-events-none rounded-r-xl" 
+                />
+                
+                <div className="overflow-x-auto scrollbar-thin scrollbar-thumb-white/20 scrollbar-track-transparent">
+                  <div className="flex justify-between mx-5 py-2 min-w-[900px] lg:min-w-full">
+                    {displayData.hourly.map((hour:any, index: number) => (
+                      <Suspense key={index}>
+                        <WeatherCard
+                          time={hour.time}
+                          temperature={handleTempConvert(hour.temperature).toString()}
+                          icon={hour.icon}
+                          unit={unit}
+                        />
+                      </Suspense>
+                    ))}
+                  </div>
                 </div>
               </div>
 

@@ -8,14 +8,14 @@ interface WeatherCardProps {
   unit: 'C' | 'F'
 }
 
-const WeatherCard: FC<WeatherCardProps> = ({ time, temperature, icon, unit }) => {
+export default function WeatherCard({ time, temperature, icon, unit }: WeatherCardProps) {
   return (
-    <div className="flex flex-col items-center">
-      <span className="text-sm">{time}</span>
-      <img src={icon} alt="weather icon" className="w-8 h-8 my-2" />
-      <span className="text-sm">{temperature}°{unit}</span>
+    <div className="mx-2 flex flex-col items-center">
+      <span className="text-sm text-white/80">{time}</span>
+      <img src={icon} alt="weather icon" className="w-10 h-10 my-2" />
+      <span className="text-base font-medium text-white">
+        {temperature}°{unit}
+      </span>
     </div>
   )
 }
-
-export default WeatherCard 
