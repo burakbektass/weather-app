@@ -8,9 +8,12 @@ export interface WeatherData {
   current: {
     temperature: number;
     location: string;
+    country: string;
     time: string;
     high: number;
     low: number;
+    humidity: number;    // Nem
+    windSpeed: number;   // Rüzgar hızı
     condition: {
       text: string;
       icon: string;
@@ -58,9 +61,12 @@ export function useWeather(city: string) {
       current: {
         temperature: data.current.temp_c,
         location: data.location.name,
+        country: data.location.country,
         time: data.location.localtime,
         high: data.forecast.forecastday[0].day.maxtemp_c,
         low: data.forecast.forecastday[0].day.mintemp_c,
+        humidity: data.current.humidity,    // Nem
+        windSpeed: data.current.wind_kph,   // Rüzgar hızı
         condition: data.current.condition
       },
       hourly: data.forecast.forecastday[0].hour

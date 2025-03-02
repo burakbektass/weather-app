@@ -7,6 +7,7 @@ import Toast from './components/Toast'
 import { useWeather, WeatherData } from '@/hooks/useWeather'
 import TemperatureToggle from './components/TemperatureToggle'
 import LoadingScreen from './components/LoadingScreen'
+import WindSpeedToggle from './components/WindSpeedToggle'
 
 export default function Home() {
   const [city, setCity] = useState(() => {
@@ -22,6 +23,12 @@ export default function Home() {
     }
     return 'C'
   })
+  const [windUnit, setWindUnit] = useState<'KPH' | 'MPH'>(() => {
+    if (typeof window !== 'undefined') {
+      return (localStorage.getItem('windUnit') as 'KPH' | 'MPH') || 'KPH'
+    }
+    return 'KPH'
+  })
   const { data, isError, error, isLoading } = useWeather(city)
   const [previousData, setPreviousData] = useState<WeatherData | null>(null)
   const [isInitialLoad, setIsInitialLoad] = useState(true)
@@ -33,6 +40,10 @@ export default function Home() {
   useEffect(() => {
     localStorage.setItem('tempUnit', unit)
   }, [unit])
+
+  useEffect(() => {
+    localStorage.setItem('windUnit', windUnit)
+  }, [windUnit])
 
   useEffect(() => {
     if (isError) {
@@ -56,6 +67,10 @@ export default function Home() {
 
   const convertTemp = (celsius: number) => {
     return unit === 'C' ? celsius : Math.round(celsius * 9/5 + 32)
+  }
+
+  const convertWindSpeed = (kph: number) => {
+    return windUnit === 'KPH' ? Math.round(kph) : Math.round(kph * 0.621371)
   }
 
   const getWeatherBackground = (condition: string) => {
@@ -102,12 +117,21 @@ export default function Home() {
                 <h1 className="text-6xl lg:text-8xl font-light mb-3 text-center lg:text-left">
                   {convertTemp(displayData.current.temperature)}°{unit}
                 </h1>
-                <h2 className="text-3xl lg:text-4xl font-medium mb-2 text-center lg:text-left">
-                  {displayData.current.location}
-                </h2>
-                <p className="text-base lg:text-lg opacity-80 text-center lg:text-left">
-                  {displayData.current.time} | H:{convertTemp(displayData.current.high)}° L:{convertTemp(displayData.current.low)}°
-                </p>
+                <div className="mb-2 text-center lg:text-left">
+                  <h2 className="text-3xl lg:text-4xl font-medium">
+                    {displayData.current.location}
+                  </h2>
+                  <p className="text-lg lg:text-xl text-white/80">
+                    {displayData.current.country}
+                  </p>
+                </div>
+                <div className="flex flex-col gap-1 text-base lg:text-lg opacity-80 text-center lg:text-left">
+                  <p>{displayData.current.time} | H:{convertTemp(displayData.current.high)}° L:{convertTemp(displayData.current.low)}°</p>
+                  <div className="flex items-center justify-center lg:justify-start">
+                    <span>Humidity: {displayData.current.humidity}% | Wind: {convertWindSpeed(displayData.current.windSpeed)}</span>
+                    <WindSpeedToggle unit={windUnit} onToggle={setWindUnit} />
+                  </div>
+                </div>
               </div>
             </div>
 

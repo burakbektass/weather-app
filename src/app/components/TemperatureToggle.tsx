@@ -12,23 +12,29 @@ const TemperatureToggle: FC<TemperatureToggleProps> = ({ unit, onToggle }) => {
       <div className="bg-black/40 backdrop-blur-2xl rounded-xl p-1 flex shadow-xl">
         <button
           onClick={() => onToggle('C')}
-          className={`px-2 sm:px-3 lg:px-4 py-2 rounded-lg transition-colors ${
+          className={`relative px-2 sm:px-3 lg:px-4 py-2 rounded-lg transition-all duration-300 ${
             unit === 'C' 
-              ? 'bg-white/10 text-white' 
+              ? 'text-white' 
               : 'text-white/70 hover:text-white'
           }`}
         >
-          °C
+          <span className="relative z-10">°C</span>
+          {unit === 'C' && (
+            <div className="absolute inset-0 bg-white/10 rounded-lg transition-all duration-300" />
+          )}
         </button>
         <button
           onClick={() => onToggle('F')}
-          className={`px-2 sm:px-3 lg:px-4 py-2 rounded-lg transition-colors ${
+          className={`relative px-2 sm:px-3 lg:px-4 py-2 rounded-lg transition-all duration-300 ${
             unit === 'F' 
-              ? 'bg-white/10 text-white' 
+              ? 'text-white' 
               : 'text-white/70 hover:text-white'
           }`}
         >
-          °F
+          <span className="relative z-10">°F</span>
+          {unit === 'F' && (
+            <div className="absolute inset-0 bg-white/10 rounded-lg transition-all duration-300" />
+          )}
         </button>
       </div>
     </div>

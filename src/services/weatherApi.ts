@@ -6,10 +6,13 @@ const BASE_URL = 'http://api.weatherapi.com/v1'
 export interface WeatherResponse {
   location: {
     name: string;
+    country: string;
     localtime: string;
   };
   current: {
     temp_c: number;
+    humidity: number;    // Nem
+    wind_kph: number;    // Rüzgar hızı
     condition: {
       text: string;
       icon: string;
