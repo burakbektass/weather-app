@@ -81,7 +81,16 @@ export default function WeatherContent() {
         <Suspense fallback={<div className="animate-pulse bg-white/10 h-10 w-20" />}>
           <TemperatureToggle unit={unit} onToggle={setUnit} />
         </Suspense>
-        <Suspense fallback={<div className="animate-pulse bg-white/10 h-12 rounded-xl" />}>
+        <Suspense 
+          fallback={
+            <div className="absolute left-1/2 -translate-x-1/2 top-1/2 -translate-y-1/2 w-full max-w-md">
+              <div className="mx-4 h-12 bg-white/10 backdrop-blur-lg rounded-xl animate-pulse flex items-center px-4">
+                <div className="w-4 h-4 rounded-full bg-white/20" />
+                <div className="ml-3 h-4 w-32 bg-white/20 rounded" />
+              </div>
+            </div>
+          }
+        >
           <SearchBar onSearch={handleSearch} />
         </Suspense>
         <Suspense fallback={null}>
