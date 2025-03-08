@@ -13,14 +13,14 @@ export default function ForecastRow({ day, icon, minTemp, maxTemp, unit }: Forec
   return (
     <div className="flex items-center justify-between">
       <span className="w-[100px] text-sm">{day}</span>
-      <div className="flex-1 flex justify-center">
+      <div className="w-[50px] flex justify-center">
         <img 
           src={icon} 
           alt="weather icon" 
           className="w-8 h-8 min-w-[32px]"
         />
       </div>
-      <div className="w-[100px] text-right">
+      <div className="w-[150px] text-right">
         <span className="text-sm">
           {maxTemp}°{unit} / {minTemp}°{unit}
         </span>
