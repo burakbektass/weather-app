@@ -106,31 +106,50 @@ export default function WeatherContent() {
         <div className="min-h-[calc(100vh-6rem)] w-full p-4 lg:p-8 flex flex-col">
           <div className="flex flex-col lg:flex-row h-full items-center lg:items-end gap-8 lg:gap-0">
             <div className="w-full lg:w-auto lg:mb-8 lg:ml-8">
-              <div className="text-white p-6 rounded-xl bg-black/40 backdrop-blur-2xl shadow-xl w-full lg:w-auto">
-                <div className="flex items-baseline justify-center lg:justify-start gap-3 mb-3">
-                  <h1 className="text-5xl lg:text-6xl font-light">
-                    {handleTempConvert(displayData.current.temperature)}°{unit}
-                  </h1>
-                  <span className="text-sm lg:text-base text-white/70">
-                    {displayData.current.condition.text}
-                  </span>
-                </div>
-                <div className="mb-2 text-center lg:text-left">
-                  <h2 className="text-2xl lg:text-3xl font-medium">
-                    {displayData.current.location}
-                  </h2>
-                  <p className="text-lg text-white/80">
-                    {displayData.current.country}
-                  </p>
-                </div>
-                <div className="flex flex-col gap-1 text-base lg:text-lg opacity-80 text-center lg:text-left">
-                  <p>{displayData.current.time} | H:{handleTempConvert(displayData.current.high)}° L:{handleTempConvert(displayData.current.low)}°</p>
-                  <div className="flex items-center justify-center lg:justify-start">
-                    <span>Humidity: {displayData.current.humidity}% | Wind: {handleWindConvert(displayData.current.windSpeed)}</span>
-                    <WindSpeedToggle unit={windUnit} onToggle={setWindUnit} />
+              <Suspense
+                fallback={
+                  <div className="text-white p-6 rounded-xl bg-black/40 backdrop-blur-2xl shadow-xl w-full lg:w-auto animate-pulse">
+                    <div className="flex items-baseline justify-center lg:justify-start gap-3 mb-3">
+                      <div className="h-14 w-32 bg-white/10 rounded" />
+                      <div className="h-5 w-20 bg-white/10 rounded" />
+                    </div>
+                    <div className="mb-2 text-center lg:text-left">
+                      <div className="h-8 w-40 bg-white/10 rounded mb-2" />
+                      <div className="h-6 w-24 bg-white/10 rounded" />
+                    </div>
+                    <div className="flex flex-col gap-1 opacity-80 text-center lg:text-left">
+                      <div className="h-5 w-64 bg-white/10 rounded" />
+                      <div className="h-5 w-48 bg-white/10 rounded" />
+                    </div>
+                  </div>
+                }
+              >
+                <div className="text-white p-6 rounded-xl bg-black/40 backdrop-blur-2xl shadow-xl w-full lg:w-auto">
+                  <div className="flex items-baseline justify-center lg:justify-start gap-3 mb-3">
+                    <h1 className="text-5xl lg:text-6xl font-light">
+                      {handleTempConvert(displayData.current.temperature)}°{unit}
+                    </h1>
+                    <span className="text-sm lg:text-base text-white/70">
+                      {displayData.current.condition.text}
+                    </span>
+                  </div>
+                  <div className="mb-2 text-center lg:text-left">
+                    <h2 className="text-2xl lg:text-3xl font-medium">
+                      {displayData.current.location}
+                    </h2>
+                    <p className="text-lg text-white/80">
+                      {displayData.current.country}
+                    </p>
+                  </div>
+                  <div className="flex flex-col gap-1 text-base lg:text-lg opacity-80 text-center lg:text-left">
+                    <p>{displayData.current.time} | H:{handleTempConvert(displayData.current.high)}° L:{handleTempConvert(displayData.current.low)}°</p>
+                    <div className="flex items-center justify-center lg:justify-start">
+                      <span>Humidity: {displayData.current.humidity}% | Wind: {handleWindConvert(displayData.current.windSpeed)}</span>
+                      <WindSpeedToggle unit={windUnit} onToggle={setWindUnit} />
+                    </div>
                   </div>
                 </div>
-              </div>
+              </Suspense>
             </div>
 
             <div className="w-full lg:w-[450px] lg:ml-auto flex flex-col gap-6 lg:mr-8">
@@ -142,7 +161,16 @@ export default function WeatherContent() {
                 <div className="overflow-x-auto scrollbar-thin scrollbar-thumb-white/20 scrollbar-track-transparent">
                   <div className="flex justify-between mx-5 py-2 min-w-[900px] lg:min-w-full">
                     {displayData.hourly.map((hour:any, index: number) => (
-                      <Suspense key={index}>
+                      <Suspense 
+                        key={index} 
+                        fallback={
+                          <div className="mx-2 flex flex-col items-center animate-pulse">
+                            <div className="h-4 w-8 bg-white/10 rounded mb-2" />
+                            <div className="w-10 h-10 rounded-full bg-white/10 my-2" />
+                            <div className="h-4 w-12 bg-white/10 rounded" />
+                          </div>
+                        }
+                      >
                         <WeatherCard
                           time={hour.time}
                           temperature={handleTempConvert(hour.temperature).toString()}
@@ -161,7 +189,22 @@ export default function WeatherContent() {
                 </div>
                 <div className="text-white px-4 space-y-3">
                   {displayData.daily.map((day:any, index: number) => (
-                    <Suspense key={index} fallback={<div className="animate-pulse bg-white/10 h-12 rounded-lg" />}>
+                    <Suspense 
+                      key={index} 
+                      fallback={
+                        <div className="flex items-center justify-between animate-pulse">
+                          <div className="w-[100px]">
+                            <div className="h-4 w-16 bg-white/10 rounded" />
+                          </div>
+                          <div className="w-[50px] flex justify-center">
+                            <div className="w-8 h-8 rounded-full bg-white/10" />
+                          </div>
+                          <div className="w-[150px] flex justify-end">
+                            <div className="h-4 w-24 bg-white/10 rounded" />
+                          </div>
+                        </div>
+                      }
+                    >
                       <ForecastRow
                         day={day.day}
                         icon={day.icon}
