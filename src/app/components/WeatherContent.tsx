@@ -78,7 +78,22 @@ export default function WeatherContent() {
       className="min-h-screen w-full bg-cover bg-center"
     >
       <div className="relative h-28 md:h-24">
-        <Suspense fallback={<div className="animate-pulse bg-white/10 h-10 w-20" />}>
+        <Suspense 
+          fallback={
+            <div className="absolute right-20 top-8 z-10">
+              <div className="flex items-center bg-black/40 backdrop-blur-lg rounded-lg p-1.5 shadow-lg animate-pulse">
+                <div className="flex items-center gap-2">
+                  <div className="w-9 h-9 bg-white/20 rounded flex items-center justify-center">
+                    <div className="w-5 h-5 bg-white/30 rounded-sm" />
+                  </div>
+                  <div className="w-9 h-9 bg-white/10 rounded flex items-center justify-center">
+                    <div className="w-5 h-5 bg-white/20 rounded-sm" />
+                  </div>
+                </div>
+              </div>
+            </div>
+          }
+        >
           <TemperatureToggle unit={unit} onToggle={setUnit} />
         </Suspense>
         <Suspense 
