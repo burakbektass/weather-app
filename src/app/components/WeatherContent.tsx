@@ -1,11 +1,10 @@
 'use client'
 import { useState, useEffect, Suspense, lazy, useCallback } from 'react'
 import { useWeather, WeatherData } from '@/hooks/useWeather'
-import { useSearchParams, useRouter } from 'next/navigation'
-import { sanitizeCity } from '@/utils/urlUtils'
+import { useLocalStorage } from '@/hooks/useLocalStorage'
+import { useUrlParams } from '@/hooks/useUrlParams'
 import { getWeatherBackground } from '@/utils/weatherUtils'
 import LoadingScreen from './LoadingScreen'
-
 
 const WeatherCard = lazy(() => import('./WeatherCard'))
 const ForecastRow = lazy(() => import('./ForecastRow'))
@@ -13,14 +12,6 @@ const SearchBar = lazy(() => import('./SearchBar'))
 const Toast = lazy(() => import('./Toast'))
 const TemperatureToggle = lazy(() => import('./TemperatureToggle'))
 const WindSpeedToggle = lazy(() => import('./WindSpeedToggle'))
-
-const CardSkeleton = () => (
-  <div className="animate-pulse bg-white/10 rounded-lg h-24 w-16" />
-)
-
-const ToggleSkeleton = () => (
-  <div className="animate-pulse bg-white/10 rounded-lg h-10 w-20" />
-)
 
 const convertTemp = (celsius: number, unit: 'C' | 'F') => {
   return unit === 'C' ? celsius : Math.round(celsius * 9/5 + 32)
@@ -31,89 +22,47 @@ const convertWindSpeed = (kph: number, unit: 'KPH' | 'MPH') => {
 }
 
 export default function WeatherContent() {
-  const searchParams = useSearchParams()
-  const router = useRouter()
-  const [city, setCity] = useState(() => {
-    if (typeof window !== 'undefined') {
-      return searchParams?.get('city') || localStorage.getItem('lastSearch') || 'Istanbul'
-    }
-    return 'Istanbul'
-  })
+  const { updateCity, getCity } = useUrlParams()
+  const [city, setCity] = useLocalStorage('lastSearch', 'Istanbul')
+  const [unit, setUnit] = useLocalStorage<'C' | 'F'>('tempUnit', 'C')
+  const [windUnit, setWindUnit] = useLocalStorage<'KPH' | 'MPH'>('windUnit', 'KPH')
+  
   const [showError, setShowError] = useState(true)
-  const [unit, setUnit] = useState<'C' | 'F'>(() => {
-    if (typeof window !== 'undefined') {
-      return (localStorage.getItem('tempUnit') as 'C' | 'F') || 'C'
-    }
-    return 'C'
-  })
-  const [windUnit, setWindUnit] = useState<'KPH' | 'MPH'>(() => {
-    if (typeof window !== 'undefined') {
-      return (localStorage.getItem('windUnit') as 'KPH' | 'MPH') || 'KPH'
-    }
-    return 'KPH'
-  })
-  const { data, isError, error, isLoading } = useWeather(city)
   const [previousData, setPreviousData] = useState<WeatherData | null>(null)
   const [isInitialLoad, setIsInitialLoad] = useState(true)
 
-  useEffect(() => {
-    localStorage.setItem('lastSearch', city)
-  }, [city])
+  const { data, isError, error, isLoading } = useWeather(city)
+
+  const handleSearch = useCallback((newCity: string) => {
+    setCity(newCity)
+    updateCity(newCity)
+  }, [setCity, updateCity])
 
   useEffect(() => {
-    localStorage.setItem('tempUnit', unit)
-  }, [unit])
-
-  useEffect(() => {
-    localStorage.setItem('windUnit', windUnit)
-  }, [windUnit])
-
-  useEffect(() => {
-    if (isError) {
-      setShowError(true)
+    const urlCity = getCity()
+    if (urlCity && urlCity !== city) {
+      setCity(urlCity)
     }
-  }, [isError, city])
+  }, [getCity, city, setCity])
 
   useEffect(() => {
-    if (data && !isError) {
-      setPreviousData(data)
-    }
-  }, [data, isError])
+    if (isError) setShowError(true)
+  }, [isError])
 
   useEffect(() => {
-    if (data || isError) {
-      setIsInitialLoad(false)
-    }
+    if (data && !isError) setPreviousData(data)
+    if (data || isError) setIsInitialLoad(false)
   }, [data, isError])
 
   const displayData = data || (isError ? previousData : null)
 
-  const handleTempConvert = useCallback((celsius: number) => {
-    return convertTemp(celsius, unit)
-  }, [unit])
+  const handleTempConvert = useCallback((celsius: number) => (
+    convertTemp(celsius, unit)
+  ), [unit])
 
-  const handleWindConvert = useCallback((kph: number) => {
-    return convertWindSpeed(kph, windUnit)
-  }, [windUnit])
-  
-  const handleSearch = useCallback((newCity: string) => {
-    setCity(newCity)
-    const params = new URLSearchParams(searchParams?.toString() || '')
-    params.set('city', newCity)
-    router.push(`/?${params.toString()}`)
-  }, [searchParams, router])
-
-  useEffect(() => {
-    const urlCity = searchParams ? searchParams.get('city') : null
-    if (urlCity) {
-      const sanitizedCity = sanitizeCity(urlCity)
-      if (sanitizedCity !== urlCity) {
-        const params = new URLSearchParams(searchParams?.toString() || '')
-        params.set('city', sanitizedCity)
-        router.replace(`/?${params.toString()}`)
-      }
-    }
-  }, [searchParams, router])
+  const handleWindConvert = useCallback((kph: number) => (
+    convertWindSpeed(kph, windUnit)
+  ), [windUnit])
 
   if (isInitialLoad || isLoading) {
     return <LoadingScreen />
@@ -129,7 +78,7 @@ export default function WeatherContent() {
       className="min-h-screen w-full bg-cover bg-center"
     >
       <div className="relative h-28 md:h-24">
-        <Suspense fallback={<ToggleSkeleton />}>
+        <Suspense fallback={<div className="animate-pulse bg-white/10 h-10 w-20" />}>
           <TemperatureToggle unit={unit} onToggle={setUnit} />
         </Suspense>
         <Suspense fallback={<div className="animate-pulse bg-white/10 h-12 rounded-xl" />}>

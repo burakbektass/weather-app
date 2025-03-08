@@ -1,6 +1,3 @@
-'use client'
-import { FC } from 'react'
-
 interface WeatherCardProps {
   time: string
   temperature: string
