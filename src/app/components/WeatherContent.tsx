@@ -200,7 +200,19 @@ export default function WeatherContent() {
 
               <div className="bg-black/40 backdrop-blur-2xl rounded-xl p-6 shadow-xl">
                 <div className="border-b border-white/20 pb-2 mb-4">
-                  <h3 className="text-white text-base mb-2">5-Day Forecast</h3>
+                  <div className="flex items-center gap-2">
+                    <h3 className="text-white text-base mb-2">3-Day Forecast</h3>
+                    <div className="group relative -mt-2">
+                      <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 text-white/80 cursor-pointer hover:text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                      </svg>
+                      <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-3 hidden group-hover:block w-72 z-50">
+                        <div className="bg-black/95 text-white text-sm rounded-lg p-3 text-center shadow-xl border border-white/10">
+                          Due to API free trial limitations, we currently show 3-day forecast. The app supports up to 5-day forecasts with the full API version.
+                        </div>
+                      </div>
+                    </div>
+                  </div>
                 </div>
                 <div className="text-white px-4 space-y-3">
                   {displayData.daily.map((day:any, index: number) => (
